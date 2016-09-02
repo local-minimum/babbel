@@ -29,9 +29,19 @@ namespace Babbel {
 		void OnGUI() {
 
             AddModalButtons();
-
+            EditorGUILayout.Space();
+            AddFilterField();
 			// Show all the tags...
 		}
+
+        void AddFilterField()
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Filter:");
+            filterQuery = GUILayout.TextField(filterQuery, GUILayout.ExpandWidth(false), GUILayout.MinWidth(120));
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+        }
 
         void AddModalButtons()
         {
