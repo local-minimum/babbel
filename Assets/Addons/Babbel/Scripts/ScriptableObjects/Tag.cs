@@ -4,7 +4,6 @@ using System.Collections;
 namespace Babbel {
 	
 	public class Tag : ScriptableObject {
-		string name;
 		string description;
 	}
 

@@ -8,9 +8,6 @@ public class SpeechAct : ScriptableObject {
 	[Tooltip("Leave empty if in game's native language")]
 	public SpeechAct translationSource;
 
-	[Tooltip("Only for editor purposes")]
-	public string name;
-
 	public string title;
 
 	public string text;
@@ -19,9 +16,9 @@ public class SpeechAct : ScriptableObject {
 
 	public List<Tag> tags = new List<Tag> ();
 	
-	public string Name {
+	public string Title {
 		get {
-			return string.IsNullOrEmpty (name) ? title : name; 
+			return string.IsNullOrEmpty (title) ? name : title; 
 		}
 	}
 }
