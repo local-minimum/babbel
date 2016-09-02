@@ -6,7 +6,13 @@ namespace Babbel {
 
 	public class TagsWindow : EditorWindow {
 
+        public static string defaultTagLocation = "Assets/Data/Babbel/Tags";
+
         enum DisplayMode { All, Ranked, Used, UsedActive, NotUsed};
+
+        Tag editTag;
+        bool editTagNameChange = false;
+        string editTagNewName;
 
         string filterQuery;
         DisplayMode displayMode = DisplayMode.All;
@@ -20,6 +26,7 @@ namespace Babbel {
         GUIContent usedActiveMode = new GUIContent("Used Active", "Only tags in active Babbel:Storyboard");
         GUIContent notUsedMode = new GUIContent("Not Used", "Only tags never used");
 
+        
         [MenuItem("Window/Babbel/Tags...")]
 		public static void ShowWindow() {
 
@@ -34,6 +41,57 @@ namespace Babbel {
 
             AddFilterField();
             EditorGUILayout.Space();
+
+            if (editTag == null)
+            {
+                if (GUILayout.Button("New Tag"))
+                {
+                    EnsureFolder(defaultTagLocation);
+                    editTag = AssetCreator.CreateAsset<Tag>(defaultTagLocation); ;                    
+                }
+            }
+            else
+            {
+                EditorGUI.BeginChangeCheck();
+                editTagNewName = EditorGUILayout.TextField("Name", string.IsNullOrEmpty(editTagNewName) ? editTag.name : editTagNewName);                
+                if (EditorGUI.EndChangeCheck())
+                {
+                    editTagNameChange = true;                    
+                }
+                editTag.description = EditorGUILayout.TextArea(editTag.description);
+                EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Button("Save and/or Close"))
+                {
+                    if (editTagNameChange)
+                    {
+                        AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(editTag), editTagNewName);
+                    }
+                    AssetDatabase.SaveAssets();
+                    editTag = null;
+                    editTagNameChange = false;
+                    editTagNewName = null;
+                }
+                else if (GUILayout.Button("Save and Keep"))
+                {
+                    if (editTagNameChange)
+                    {
+                        AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(editTag), editTagNewName);
+                    }
+                    AssetDatabase.SaveAssets();
+                    editTagNameChange = false;
+                    editTagNameChange = false;
+                    editTagNewName = null;
+                }
+                else if (GUILayout.Button("Delete"))
+                {
+                    AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(editTag));
+                    editTag = null;
+                    editTagNameChange = false;
+                    editTagNewName = null;
+                }
+
+                EditorGUILayout.EndHorizontal();
+            }
 
             AddTags();
 
@@ -78,6 +136,10 @@ namespace Babbel {
         {
             if (displayMode == DisplayMode.All)
             {
+                string[] guids = AssetDatabase.FindAssets("t:Babbel.Tag");
+                foreach (string guid in guids) {
+                    AddTag(AssetDatabase.LoadAssetAtPath<Tag>(AssetDatabase.GUIDToAssetPath(guid)));
+                }
 
             } else
             {
@@ -91,6 +153,31 @@ namespace Babbel {
             GUILayout.Label(tag.name);
             GUILayout.Label(tag.description);
             GUILayout.EndHorizontal();
+        }
+
+        void EnsureFolder(string path)
+        {
+            string parent = null;
+            foreach(string child in path.Split('/'))
+            {
+                if (string.IsNullOrEmpty(parent))
+                {
+                    parent = child;
+                    continue;
+                }
+
+                string curPath = string.Join("/", new string[] { parent, child });
+
+                if (AssetDatabase.IsValidFolder(curPath))
+                {
+                    parent = curPath;
+                }
+                else
+                {
+                    string guid = AssetDatabase.CreateFolder(parent, child);
+                    parent = AssetDatabase.GUIDToAssetPath(guid);
+                } 
+            }
         }
 	}
 
