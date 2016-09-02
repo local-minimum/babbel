@@ -6,7 +6,7 @@ namespace Babbel {
 
 	public class TagsWindow : EditorWindow {
 
-        enum DisplayMode { All, Ranked, Used, NotUsed};
+        enum DisplayMode { All, Ranked, Used, UsedActive, NotUsed};
 
         string filterQuery;
         DisplayMode displayMode = DisplayMode.All;
@@ -17,6 +17,7 @@ namespace Babbel {
         GUIContent allMode = new GUIContent("All", "All registered tags");
         GUIContent rankedMode = new GUIContent("Ranked", "Sort tags based on usage");
         GUIContent usedMode = new GUIContent("Used", "Only tags in use");
+        GUIContent usedActiveMode = new GUIContent("Used Active", "Only tags in active Babbel:Storyboard");
         GUIContent notUsedMode = new GUIContent("Not Used", "Only tags never used");
 
         [MenuItem("Window/Babbel/Tags...")]
@@ -31,7 +32,8 @@ namespace Babbel {
             AddModalButtons();
             EditorGUILayout.Space();
             AddFilterField();
-			// Show all the tags...
+			
+
 		}
 
         void AddFilterField()
@@ -50,6 +52,7 @@ namespace Babbel {
             LayOutModal(DisplayMode.All, allMode);
             LayOutModal(DisplayMode.Ranked, rankedMode);
             LayOutModal(DisplayMode.Used, usedMode);
+            LayOutModal(DisplayMode.UsedActive, usedActiveMode);
             LayOutModal(DisplayMode.NotUsed, notUsedMode);
             GUILayout.EndHorizontal();
         }
@@ -66,6 +69,14 @@ namespace Babbel {
                     displayMode = mode;
                 }
             }
+        }
+
+        void AddTag(Tag tag)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(tag.name);
+            GUILayout.Label(tag.description);
+            GUILayout.EndHorizontal();
         }
 	}
 
