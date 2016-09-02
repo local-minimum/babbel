@@ -31,8 +31,11 @@ namespace Babbel {
 
             AddModalButtons();
             EditorGUILayout.Space();
+
             AddFilterField();
-			
+            EditorGUILayout.Space();
+
+            AddTags();
 
 		}
 
@@ -68,6 +71,17 @@ namespace Babbel {
                 {
                     displayMode = mode;
                 }
+            }
+        }
+
+        void AddTags()
+        {
+            if (displayMode == DisplayMode.All)
+            {
+
+            } else
+            {
+                EditorGUILayout.HelpBox("Feature not yet implemented", MessageType.Error);
             }
         }
 
