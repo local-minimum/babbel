@@ -18,16 +18,7 @@ namespace Babbel {
         DisplayMode displayMode = DisplayMode.All;
 
         [SerializeField]
-        GUIStyle inactiveToggleButtons = null;
-        [SerializeField]
-        GUIStyle activeToggleButtons = null;
-
-        GUIContent allMode = new GUIContent("All", "All registered tags");
-        GUIContent rankedMode = new GUIContent("Ranked", "Sort tags based on usage");
-        GUIContent usedMode = new GUIContent("Used", "Only tags in use");
-        GUIContent usedActiveMode = new GUIContent("Used Active", "Only tags in active Babbel:Storyboard");
-        GUIContent notUsedMode = new GUIContent("Not Used", "Only tags never used");
-
+        BabbelEditorTheme theme;       
         
         [MenuItem("Window/Babbel/Tags...")]
 		public static void ShowWindow() {
@@ -38,46 +29,59 @@ namespace Babbel {
             window.Focus();
 		}
 
-        public void AssignStyles()
+        public void SetTheme(BabbelEditorTheme theme=null)
         {
-            GUISkin skin = AssetTools.LoadByQuery<GUISkin>("BabbelSkin t:GUISkin");
-            activeToggleButtons = skin.button;
-            inactiveToggleButtons = skin.customStyles[0];
-
+            if (theme == null)
+            {
+                theme = AssetTools.LoadByQuery<BabbelEditorTheme>("t:BabbelEditorTheme");
+            }
+            this.theme = theme;
         }
 
 		void OnGUI() {
 
-            if (true || activeToggleButtons == null)
+            if (theme == null)
             {
-                AssignStyles();
+                SetTheme();
             }
 
             AddModalButtons();
+
+            EditorGUILayout.Space();
+
+            AddEditArea();
+
             EditorGUILayout.Space();
 
             AddFilterField();
-            EditorGUILayout.Space();
+            AddTags();
 
+            GUILayout.FlexibleSpace();
+
+
+        }
+
+        void AddEditArea()
+        {
             if (editTag == null)
             {
-                if (GUILayout.Button("New Tag"))
+                if (GUILayout.Button(theme.Add, theme.UpStateToggle))
                 {
                     EnsureFolder(defaultTagLocation);
-                    editTag = AssetTools.CreateAsset<Tag>(defaultTagLocation); ;                    
+                    editTag = AssetTools.CreateAsset<Tag>(defaultTagLocation); ;
                 }
             }
             else
             {
                 EditorGUI.BeginChangeCheck();
-                editTagNewName = EditorGUILayout.TextField("Name", string.IsNullOrEmpty(editTagNewName) ? editTag.name : editTagNewName);                
+                editTagNewName = EditorGUILayout.TextField(string.IsNullOrEmpty(editTagNewName) ? editTag.name : editTagNewName, theme.Title);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    editTagNameChange = true;                    
+                    editTagNameChange = true;
                 }
-                editTag.description = EditorGUILayout.TextArea(editTag.description);
+                editTag.description = EditorGUILayout.TextArea(editTag.description, theme.Text);
                 EditorGUILayout.BeginHorizontal();
-                if (GUILayout.Button("Save and/or Close"))
+                if (GUILayout.Button(theme.SaveClose, theme.UpStateToggle))
                 {
                     if (editTagNameChange)
                     {
@@ -88,7 +92,7 @@ namespace Babbel {
                     editTagNameChange = false;
                     editTagNewName = null;
                 }
-                else if (GUILayout.Button("Save and Keep"))
+                else if (GUILayout.Button(theme.Save, theme.UpStateToggle))
                 {
                     if (editTagNameChange)
                     {
@@ -99,7 +103,7 @@ namespace Babbel {
                     editTagNameChange = false;
                     editTagNewName = null;
                 }
-                else if (GUILayout.Button("Delete"))
+                else if (GUILayout.Button(theme.Delete, theme.UpStateToggle))
                 {
                     AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(editTag));
                     editTag = null;
@@ -110,15 +114,13 @@ namespace Babbel {
                 EditorGUILayout.EndHorizontal();
             }
 
-            AddTags();
-
-		}
+        }
 
         void AddFilterField()
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Filter:");
-            filterQuery = GUILayout.TextField(string.IsNullOrEmpty(filterQuery) ? "" : filterQuery, GUILayout.ExpandWidth(false), GUILayout.MinWidth(120));
+            GUILayout.Label(theme.Filter, theme.Title);
+            filterQuery = GUILayout.TextField(string.IsNullOrEmpty(filterQuery) ? "" : filterQuery, theme.IconAligningInput);
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
         }
@@ -128,11 +130,11 @@ namespace Babbel {
             //Modal buttons
             GUILayout.BeginHorizontal();
             EditorGUILayout.Space();
-            LayOutModal(DisplayMode.All, allMode);
-            LayOutModal(DisplayMode.Ranked, rankedMode);
-            LayOutModal(DisplayMode.Used, usedMode);
-            LayOutModal(DisplayMode.UsedActive, usedActiveMode);
-            LayOutModal(DisplayMode.NotUsed, notUsedMode);
+            LayOutModal(DisplayMode.All, theme.TagModeAll);
+            LayOutModal(DisplayMode.Ranked, theme.TagModeRanked);
+            LayOutModal(DisplayMode.Used, theme.TagModeUsed);
+            LayOutModal(DisplayMode.UsedActive, theme.TagModeUsedActive);
+            LayOutModal(DisplayMode.NotUsed, theme.TagModeNotUsed);
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
         }
@@ -141,10 +143,10 @@ namespace Babbel {
         {
             if (mode == displayMode)
             {
-                GUILayout.Label(content, inactiveToggleButtons);
+                GUILayout.Label(content, theme.DownStateToggle);
             } else
             {
-                if (GUILayout.Button(content, activeToggleButtons))
+                if (GUILayout.Button(content, theme.UpStateToggle))
                 {
                     displayMode = mode;
                 }
@@ -153,6 +155,10 @@ namespace Babbel {
 
         void AddTags()
         {
+            GUILayout.BeginHorizontal();
+            EditorGUILayout.Space();
+            Vector2 pos = Vector2.zero;
+            pos = GUILayout.BeginScrollView(pos, false, true);
             if (displayMode == DisplayMode.All)
             {
                 string[] guids = AssetDatabase.FindAssets("t:Babbel.Tag");
@@ -164,13 +170,20 @@ namespace Babbel {
             {
                 EditorGUILayout.HelpBox("Feature not yet implemented", MessageType.Error);
             }
+            GUILayout.EndScrollView();
+            EditorGUILayout.EndHorizontal();
         }
 
         void AddTag(Tag tag)
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(tag.name);
-            GUILayout.Label(tag.description);
+            if (GUILayout.Button(tag.name, theme.Title))
+            {
+                editTag = tag;
+                editTagNewName = null;
+                editTagNameChange = false;
+            }
+            GUILayout.Label(tag.description, theme.Text);
             GUILayout.EndHorizontal();
         }
 
