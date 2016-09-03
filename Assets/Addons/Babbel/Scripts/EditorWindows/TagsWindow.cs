@@ -8,11 +8,15 @@ namespace Babbel {
 
         public static string defaultTagLocation = "Assets/Data/Babbel/Tags";
 
+        public static string filterFieldName = "babbel:tags_window:filter_field";
+
         enum DisplayMode { All, Ranked, Used, UsedActive, NotUsed};
 
         Tag editTag;
         bool editTagNameChange = false;
         string editTagNewName;
+        string editTagNewDescription;
+        bool editGiveFocus = true;
 
         string filterQuery;
         DisplayMode displayMode = DisplayMode.All;
@@ -79,18 +83,19 @@ namespace Babbel {
                 {
                     editTagNameChange = true;
                 }
-                editTag.description = EditorGUILayout.TextArea(editTag.description, theme.Text);
+                editTagNewDescription = EditorGUILayout.TextField(string.IsNullOrEmpty(editTagNewDescription) ? editTag.description : editTagNewDescription, theme.Text);
                 EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button(theme.SaveClose, theme.UpStateToggle))
                 {
+                    if (editTagNewDescription != null) {
+                        editTag.description = editTagNewDescription;
+                    }
                     if (editTagNameChange)
                     {
                         AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(editTag), editTagNewName);
                     }
                     AssetDatabase.SaveAssets();
-                    editTag = null;
-                    editTagNameChange = false;
-                    editTagNewName = null;
+                    ClearEditTagEdit();
                 }
                 else if (GUILayout.Button(theme.Save, theme.UpStateToggle))
                 {
@@ -99,16 +104,16 @@ namespace Babbel {
                         AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(editTag), editTagNewName);
                     }
                     AssetDatabase.SaveAssets();
-                    editTagNameChange = false;
-                    editTagNameChange = false;
-                    editTagNewName = null;
+                    ClearEditTagEdit(true);
+                }
+                else if (GUILayout.Button(theme.Close, theme.UpStateToggle))
+                {
+                    ClearEditTagEdit();
                 }
                 else if (GUILayout.Button(theme.Delete, theme.UpStateToggle))
                 {
                     AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(editTag));
-                    editTag = null;
-                    editTagNameChange = false;
-                    editTagNewName = null;
+                    ClearEditTagEdit();
                 }
 
                 EditorGUILayout.EndHorizontal();
@@ -116,11 +121,30 @@ namespace Babbel {
 
         }
 
+        void ClearEditTagEdit(bool keepTag=false)
+        {
+            if (!keepTag)
+            {
+                editTag = null;
+            }
+
+            editTagNameChange = false;
+            editTagNewDescription = null;
+            editTagNewName = null;
+            editGiveFocus = true;          
+        }
+
         void AddFilterField()
         {
             GUILayout.BeginHorizontal();
             GUILayout.Label(theme.Filter, theme.Title);
+            GUI.SetNextControlName(filterFieldName);
             filterQuery = GUILayout.TextField(string.IsNullOrEmpty(filterQuery) ? "" : filterQuery, theme.IconAligningInput);
+            if (editGiveFocus)
+            {
+                GUI.FocusControl(filterFieldName);
+                editGiveFocus = false;
+            }
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
         }
@@ -163,7 +187,15 @@ namespace Babbel {
             {
                 string[] guids = AssetDatabase.FindAssets("t:Babbel.Tag");
                 foreach (string guid in guids) {
-                    AddTag(AssetDatabase.LoadAssetAtPath<Tag>(AssetDatabase.GUIDToAssetPath(guid)));
+                    Tag tag = AssetDatabase.LoadAssetAtPath<Tag>(AssetDatabase.GUIDToAssetPath(guid));
+                    if (!string.IsNullOrEmpty(filterQuery)) {
+                        if (tag.name.Contains(filterQuery) || tag.description.Contains(filterQuery))
+                        {
+                            AddTag(tag);
+                        }
+                    } else {
+                        AddTag(tag);
+                    }
                 }
 
             } else
@@ -179,9 +211,8 @@ namespace Babbel {
             GUILayout.BeginHorizontal();
             if (GUILayout.Button(tag.name, theme.Title))
             {
+                ClearEditTagEdit();
                 editTag = tag;
-                editTagNewName = null;
-                editTagNameChange = false;
             }
             GUILayout.Label(tag.description, theme.Text);
             GUILayout.EndHorizontal();

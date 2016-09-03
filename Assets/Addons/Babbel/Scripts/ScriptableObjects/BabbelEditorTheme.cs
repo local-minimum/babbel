@@ -23,6 +23,7 @@ namespace Babbel
         public GUIContent Add;
         public GUIContent Save;
         public GUIContent SaveClose;
+        public GUIContent Close;
         public GUIContent Delete;
         public GUIContent Filter;
 
