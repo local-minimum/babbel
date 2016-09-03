@@ -101,7 +101,7 @@ namespace Babbel {
         {
             GUILayout.BeginHorizontal();
             GUILayout.Label("Filter:");
-            filterQuery = GUILayout.TextField(filterQuery, GUILayout.ExpandWidth(false), GUILayout.MinWidth(120));
+            filterQuery = GUILayout.TextField(string.IsNullOrEmpty(filterQuery) ? "" : filterQuery, GUILayout.ExpandWidth(false), GUILayout.MinWidth(120));
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
         }
