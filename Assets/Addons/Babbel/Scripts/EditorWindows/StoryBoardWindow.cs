@@ -8,8 +8,8 @@ namespace Babbel
     {
 
         bool expandedMenu = false;
-        Rect menuPosition = new Rect(4, 4, 16, 16);
-        Rect expandedMenuPosition = new Rect(22, 4, 0, 120);
+        Rect menuPosition = new Rect(4, 4, 19, 19);
+        Rect expandedMenuPosition = new Rect(25, 4, 0, 120);
 
         ScriptableObject scene = null;
         ScriptableObject act = null;
@@ -30,8 +30,8 @@ namespace Babbel
 
         void AddMenu()
         {
-            
-            if (GUI.Button(menuPosition, theme.Menu, theme.Title)) {
+
+            if (GUI.Button(menuPosition, theme.Menu, expandedMenu ? theme.TitleActive : theme.Title)) {
                 expandedMenu = !expandedMenu;
             }
 

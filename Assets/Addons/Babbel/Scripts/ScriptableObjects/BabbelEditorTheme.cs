@@ -20,6 +20,7 @@ namespace Babbel
         public GUIStyle Input;
         public GUIStyle IconAligningInput;
         public GUIStyle Title;
+        public GUIStyle TitleActive;
         public GUIStyle Text;
         public GUIStyle Scrolls;
 
