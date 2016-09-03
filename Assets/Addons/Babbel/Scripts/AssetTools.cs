@@ -45,6 +45,31 @@ namespace Babbel
             }
             return null;
         }
+
+        public static void EnsureFolder(string path)
+        {
+            string parent = null;
+            foreach (string child in path.Split('/'))
+            {
+                if (string.IsNullOrEmpty(parent))
+                {
+                    parent = child;
+                    continue;
+                }
+
+                string curPath = string.Join("/", new string[] { parent, child });
+
+                if (AssetDatabase.IsValidFolder(curPath))
+                {
+                    parent = curPath;
+                }
+                else
+                {
+                    string guid = AssetDatabase.CreateFolder(parent, child);
+                    parent = AssetDatabase.GUIDToAssetPath(guid);
+                }
+            }
+        }
     }
 
 }

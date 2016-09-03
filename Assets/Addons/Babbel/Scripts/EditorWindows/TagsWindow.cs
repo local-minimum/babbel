@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Babbel {
 
-	public class TagsWindow : EditorWindow {
+	public class TagsWindow : AbstractBabbelWindow {
 
         public static string defaultTagLocation = "Assets/Data/Babbel/Tags";
 
@@ -20,37 +20,18 @@ namespace Babbel {
         Vector2 tagScrollPosition = Vector2.zero;
 
         string filterQuery;
-        DisplayMode displayMode = DisplayMode.All;
-
-        [SerializeField]
-        BabbelEditorTheme theme;       
+        DisplayMode displayMode = DisplayMode.All;     
         
-        [MenuItem("Window/Babbel/Tags...")]
+        [MenuItem("Window/Babbel/Tags", priority = 1)]
 		public static void ShowWindow() {
 
-			EditorWindow window = EditorWindow.GetWindow (typeof(TagsWindow));
-			window.titleContent = new GUIContent ("Babbel:Tags");
-
+			EditorWindow window = EditorWindow.GetWindow (typeof(TagsWindow));	
             window.Focus();
 		}
 
-        public void SetTheme(BabbelEditorTheme theme=null)
+        protected override void OnGUI()
         {
-            if (theme == null)
-            {
-                theme = AssetTools.LoadByQuery<BabbelEditorTheme>("t:BabbelEditorTheme");
-            }
-            this.theme = theme;
-        }
-
-		void OnGUI() {
-
-            if (theme == null)
-            {
-                SetTheme();
-            }
-
-            GUI.DrawTexture(new Rect(0, 0, maxSize.x, maxSize.y), theme.TagBackground, ScaleMode.StretchToFill);
+            base.OnGUI();
             
             AddModalButtons();
 
@@ -71,7 +52,7 @@ namespace Babbel {
             {
                 if (GUILayout.Button(theme.Add, theme.UpStateToggle))
                 {
-                    EnsureFolder(defaultTagLocation);
+                    AssetTools.EnsureFolder(defaultTagLocation);
                     editTag = AssetTools.CreateAsset<Tag>(defaultTagLocation); ;
                 }
             }
@@ -263,30 +244,6 @@ namespace Babbel {
             GUILayout.EndHorizontal();
         }
 
-        void EnsureFolder(string path)
-        {
-            string parent = null;
-            foreach(string child in path.Split('/'))
-            {
-                if (string.IsNullOrEmpty(parent))
-                {
-                    parent = child;
-                    continue;
-                }
-
-                string curPath = string.Join("/", new string[] { parent, child });
-
-                if (AssetDatabase.IsValidFolder(curPath))
-                {
-                    parent = curPath;
-                }
-                else
-                {
-                    string guid = AssetDatabase.CreateFolder(parent, child);
-                    parent = AssetDatabase.GUIDToAssetPath(guid);
-                } 
-            }
-        }
 	}
 
 }

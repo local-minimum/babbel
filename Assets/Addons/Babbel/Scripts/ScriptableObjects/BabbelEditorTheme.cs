@@ -10,7 +10,8 @@ namespace Babbel
 
         [Space()]
 
-        public Texture2D TagBackground;
+        public Texture2D BabbelLogo;
+        public Texture2D WindowBackground;
 
         [Space()]
 
@@ -24,12 +25,18 @@ namespace Babbel
 
         [Space()]
 
+        public GUIContent StoryActs;
+        public GUIContent StoryScenes;
+        
+        [Space()]
+
         public GUIContent Add;
         public GUIContent Save;
         public GUIContent SaveClose;
         public GUIContent Close;
         public GUIContent Delete;
         public GUIContent Filter;
+        public GUIContent Menu;
 
         [Space()]
 
