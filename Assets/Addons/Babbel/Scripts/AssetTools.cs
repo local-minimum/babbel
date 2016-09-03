@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Babbel
 {
-    public static class AssetCreator
+    public static class AssetTools
     {
 
 
@@ -36,6 +36,14 @@ namespace Babbel
             AssetDatabase.Refresh();
 
             return asset;
+        }
+
+        public static T LoadByQuery<T>(string query) where T : UnityEngine.Object
+        {
+            foreach (string guid in AssetDatabase.FindAssets(query)){
+                return AssetDatabase.LoadAssetAtPath<T>(AssetDatabase.GUIDToAssetPath(guid));
+            }
+            return null;
         }
     }
 

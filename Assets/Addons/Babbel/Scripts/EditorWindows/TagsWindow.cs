@@ -17,8 +17,10 @@ namespace Babbel {
         string filterQuery;
         DisplayMode displayMode = DisplayMode.All;
 
-        public static GUIStyle inactiveToggleButtons = new GUIStyle();
-        public static GUIStyle activeToggleButtons = new GUIStyle();
+        [SerializeField]
+        GUIStyle inactiveToggleButtons = null;
+        [SerializeField]
+        GUIStyle activeToggleButtons = null;
 
         GUIContent allMode = new GUIContent("All", "All registered tags");
         GUIContent rankedMode = new GUIContent("Ranked", "Sort tags based on usage");
@@ -32,9 +34,24 @@ namespace Babbel {
 
 			EditorWindow window = EditorWindow.GetWindow (typeof(TagsWindow));
 			window.titleContent = new GUIContent ("Babbel:Tags");
+
+            window.Focus();
 		}
 
+        public void AssignStyles()
+        {
+            GUISkin skin = AssetTools.LoadByQuery<GUISkin>("BabbelSkin t:GUISkin");
+            activeToggleButtons = skin.button;
+            inactiveToggleButtons = skin.customStyles[0];
+
+        }
+
 		void OnGUI() {
+
+            if (true || activeToggleButtons == null)
+            {
+                AssignStyles();
+            }
 
             AddModalButtons();
             EditorGUILayout.Space();
@@ -47,7 +64,7 @@ namespace Babbel {
                 if (GUILayout.Button("New Tag"))
                 {
                     EnsureFolder(defaultTagLocation);
-                    editTag = AssetCreator.CreateAsset<Tag>(defaultTagLocation); ;                    
+                    editTag = AssetTools.CreateAsset<Tag>(defaultTagLocation); ;                    
                 }
             }
             else
@@ -110,11 +127,13 @@ namespace Babbel {
         {
             //Modal buttons
             GUILayout.BeginHorizontal();
+            EditorGUILayout.Space();
             LayOutModal(DisplayMode.All, allMode);
             LayOutModal(DisplayMode.Ranked, rankedMode);
             LayOutModal(DisplayMode.Used, usedMode);
             LayOutModal(DisplayMode.UsedActive, usedActiveMode);
             LayOutModal(DisplayMode.NotUsed, notUsedMode);
+            GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
         }
 
@@ -122,10 +141,10 @@ namespace Babbel {
         {
             if (mode == displayMode)
             {
-                GUILayout.Label(content);
+                GUILayout.Label(content, inactiveToggleButtons);
             } else
             {
-                if (GUILayout.Button(content))
+                if (GUILayout.Button(content, activeToggleButtons))
                 {
                     displayMode = mode;
                 }
