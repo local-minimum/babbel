@@ -27,6 +27,8 @@ namespace Babbel
 
         public GUIContent StoryActs;
         public GUIContent StoryScenes;
+        public GUIContent NoAct;
+        public GUIContent NoScene;
         
         [Space()]
 

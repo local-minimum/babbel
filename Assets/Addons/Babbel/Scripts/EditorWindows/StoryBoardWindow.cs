@@ -11,6 +11,8 @@ namespace Babbel
         Rect menuPosition = new Rect(4, 4, 16, 16);
         Rect expandedMenuPosition = new Rect(22, 4, 0, 120);
 
+        ScriptableObject scene = null;
+        ScriptableObject act = null;
 
         [MenuItem("Window/Babbel/Storyboard", priority = 0)]
         public static void ShowWindow()
@@ -33,11 +35,13 @@ namespace Babbel
                 expandedMenu = !expandedMenu;
             }
 
+            expandedMenuPosition.width = maxSize.x - (4 + expandedMenuPosition.x);
+
+            GUILayout.BeginArea(expandedMenuPosition);
+
+
             if (expandedMenu)
             {
-                expandedMenuPosition.width = maxSize.x - (4 + expandedMenuPosition.x);
-
-                GUILayout.BeginArea(expandedMenuPosition);
 
                 //ACTS
 
@@ -60,15 +64,41 @@ namespace Babbel
 
                 //TODO: List Scenes
 
-                if (GUILayout.Button(theme.Add, theme.UpStateToggle))
+                if (GUILayout.Button(theme.Add, act == null ? theme.DownStateToggle : theme.UpStateToggle))
                 {
+                    if (act == null)
+                    {
 
+                    }
                 }
                 GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
+            } else
+            {
+                GUILayout.BeginHorizontal();
+                if (act == null)
+                {
+                    GUILayout.Label(theme.NoAct, theme.Title);
+                } else
+                {
+                    GUILayout.Label(act.name, theme.Title);
+
+                    if (scene == null)
+                    {
+                        GUILayout.Label(theme.NoScene, theme.Text);
+                    } else
+                    {
+                        GUILayout.Label(scene.name, theme.Text);
+                    }
+                }
+
                 GUILayout.FlexibleSpace();
-                GUILayout.EndArea();
+                GUILayout.EndHorizontal();
             }
+
+            GUILayout.FlexibleSpace();
+            GUILayout.EndArea();
+
         }
 
     }
