@@ -6,7 +6,11 @@ namespace Babbel
     [CreateAssetMenu(fileName = "BabbelTheme", menuName = "Babbel/New Theme", order = 1)]
     public class BabbelEditorTheme : ScriptableObject
     {
-        public GUISettings Settings;
+        public GUISettings TagSettings;
+
+        [Space()]
+
+        public Texture2D TagBackground;
 
         [Space()]
 

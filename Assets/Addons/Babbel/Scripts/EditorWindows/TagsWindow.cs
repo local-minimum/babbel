@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System.Collections;
+using System.Collections.Generic;
 
 namespace Babbel {
 
@@ -17,6 +17,7 @@ namespace Babbel {
         string editTagNewName;
         string editTagNewDescription;
         bool editGiveFocus = true;
+        Vector2 tagScrollPosition = Vector2.zero;
 
         string filterQuery;
         DisplayMode displayMode = DisplayMode.All;
@@ -49,6 +50,8 @@ namespace Babbel {
                 SetTheme();
             }
 
+            GUI.DrawTexture(new Rect(0, 0, maxSize.x, maxSize.y), theme.TagBackground, ScaleMode.StretchToFill);
+            
             AddModalButtons();
 
             EditorGUILayout.Space();
@@ -59,9 +62,6 @@ namespace Babbel {
 
             AddFilterField();
             AddTags();
-
-            GUILayout.FlexibleSpace();
-
 
         }
 
@@ -181,11 +181,10 @@ namespace Babbel {
         {
             GUILayout.BeginHorizontal();
             EditorGUILayout.Space();
-            Vector2 pos = Vector2.zero;
-            pos = GUILayout.BeginScrollView(pos, false, true);
-            if (displayMode == DisplayMode.All)
+            tagScrollPosition = GUILayout.BeginScrollView(tagScrollPosition, false, false);
+            List<string> guids = GetGUIDs();
+            if (guids != null)
             {
-                string[] guids = AssetDatabase.FindAssets("t:Babbel.Tag");
                 foreach (string guid in guids) {
                     Tag tag = AssetDatabase.LoadAssetAtPath<Tag>(AssetDatabase.GUIDToAssetPath(guid));
                     if (!string.IsNullOrEmpty(filterQuery)) {
@@ -202,8 +201,47 @@ namespace Babbel {
             {
                 EditorGUILayout.HelpBox("Feature not yet implemented", MessageType.Error);
             }
+            GUILayout.FlexibleSpace();
             GUILayout.EndScrollView();
             EditorGUILayout.EndHorizontal();
+        }
+
+        List<string> GetGUIDs()
+        {
+            //TODO: Don't search database each time in future...
+            List<string> GUIDs = new List<string>();
+            string[] guids = AssetDatabase.FindAssets("t:Babbel.Tag");
+            if (displayMode == DisplayMode.All)
+            {
+                GUIDs.AddRange(guids);
+            }
+            else if (displayMode == DisplayMode.Used)
+            {
+                Hash128 empty = new Hash128(0,0,0,0);               
+                foreach (string guid in guids)
+                {
+                    if (AssetDatabase.GetAssetDependencyHash(guid) != empty)
+                    {
+                        GUIDs.Add(guid);
+                    }
+                }
+            } else if (displayMode == DisplayMode.NotUsed)
+            {
+                Hash128 empty = new Hash128(0, 0, 0, 0);
+                foreach (string guid in guids)
+                {
+                    if (AssetDatabase.GetAssetDependencyHash(guid) == empty)
+                    {
+                        GUIDs.Add(guid);
+                    }
+                }
+            }
+            else
+            {
+                return null;
+            }
+
+            return GUIDs;
         }
 
         void AddTag(Tag tag)
