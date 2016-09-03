@@ -87,23 +87,12 @@ namespace Babbel {
                 EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button(theme.SaveClose, theme.UpStateToggle))
                 {
-                    if (editTagNewDescription != null) {
-                        editTag.description = editTagNewDescription;
-                    }
-                    if (editTagNameChange)
-                    {
-                        AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(editTag), editTagNewName);
-                    }
-                    AssetDatabase.SaveAssets();
+                    SaveEditTag();
                     ClearEditTagEdit();
                 }
                 else if (GUILayout.Button(theme.Save, theme.UpStateToggle))
                 {
-                    if (editTagNameChange)
-                    {
-                        AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(editTag), editTagNewName);
-                    }
-                    AssetDatabase.SaveAssets();
+                    SaveEditTag(); 
                     ClearEditTagEdit(true);
                 }
                 else if (GUILayout.Button(theme.Close, theme.UpStateToggle))
@@ -119,6 +108,19 @@ namespace Babbel {
                 EditorGUILayout.EndHorizontal();
             }
 
+        }
+
+        void SaveEditTag()
+        {
+            if (editTagNewDescription != null)
+            {
+                editTag.description = editTagNewDescription;
+            }
+            if (editTagNameChange)
+            {
+                AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(editTag), editTagNewName);
+            }
+            AssetDatabase.SaveAssets();
         }
 
         void ClearEditTagEdit(bool keepTag=false)
@@ -187,6 +189,11 @@ namespace Babbel {
             {
                 foreach (string guid in guids) {
                     Tag tag = AssetDatabase.LoadAssetAtPath<Tag>(AssetDatabase.GUIDToAssetPath(guid));
+                    if (tag == null)
+                    {
+                        continue;
+                    }
+
                     if (!string.IsNullOrEmpty(filterQuery)) {
                         if (tag.name.Contains(filterQuery) || tag.description.Contains(filterQuery))
                         {
