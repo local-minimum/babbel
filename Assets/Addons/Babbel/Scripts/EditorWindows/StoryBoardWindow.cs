@@ -11,13 +11,48 @@ namespace Babbel
         Rect menuPosition = new Rect(4, 4, 19, 19);
         Rect expandedMenuPosition = new Rect(25, 4, 0, 120);
 
-        ScriptableObject scene = null;
-        ScriptableObject act = null;
+        BabbelStory activeStory = null;
+        StoryAct activeAct = null;
+        Scene activeScene = null;
+        
+        static StoryBoardWindow window;
 
+        public static BabbelStory Story
+        {
+            get
+            {
+                if (window == null)
+                {
+                    return BabbelStory.Main;
+                } else if (window.activeStory == null)
+                {
+                    window.activeStory = BabbelStory.Main;
+                }
+                return window.activeStory;
+            }
+        }
+
+        public static AbstractBoard ActiveBoard
+        {
+            get
+            {
+                if (window == null)
+                {
+                    return null;
+                } else if (window.activeScene == null)
+                {
+                    return window.activeAct;
+                } else
+                {
+                    return window.activeScene;
+                }
+            }
+        }
+        
         [MenuItem("Window/Babbel/Storyboard", priority = 0)]
         public static void ShowWindow()
         {
-            EditorWindow window = EditorWindow.GetWindow(typeof(StoryBoardWindow));           
+            window = GetWindow<StoryBoardWindow>(typeof(StoryBoardWindow));           
             window.Focus();
         }
 
@@ -64,9 +99,9 @@ namespace Babbel
 
                 //TODO: List Scenes
 
-                if (GUILayout.Button(theme.Add, act == null ? theme.DownStateToggle : theme.UpStateToggle))
+                if (GUILayout.Button(theme.Add, activeAct == null ? theme.DownStateToggle : theme.UpStateToggle))
                 {
-                    if (act == null)
+                    if (activeAct == null)
                     {
 
                     }
@@ -76,19 +111,19 @@ namespace Babbel
             } else
             {
                 GUILayout.BeginHorizontal();
-                if (act == null)
+                if (activeAct == null)
                 {
                     GUILayout.Label(theme.NoAct, theme.Title);
                 } else
                 {
-                    GUILayout.Label(act.name, theme.Title);
+                    GUILayout.Label(activeAct.name, theme.Title);
 
-                    if (scene == null)
+                    if (activeScene == null)
                     {
                         GUILayout.Label(theme.NoScene, theme.Text);
                     } else
                     {
-                        GUILayout.Label(scene.name, theme.Text);
+                        GUILayout.Label(activeScene.name, theme.Text);
                     }
                 }
 

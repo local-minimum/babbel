@@ -199,6 +199,8 @@ namespace Babbel {
             //TODO: Don't search database each time in future...
             List<string> GUIDs = new List<string>();
             string[] guids = AssetDatabase.FindAssets("t:Babbel.Tag");
+                        
+            
             if (displayMode == DisplayMode.All)
             {
                 GUIDs.AddRange(guids);
