@@ -165,11 +165,11 @@ namespace Babbel {
             GUILayout.BeginHorizontal();
             EditorGUILayout.Space();
             tagScrollPosition = GUILayout.BeginScrollView(tagScrollPosition, false, false);
-            List<string> guids = GetGUIDs();
-            if (guids != null)
+            List<Tag> tags = GetTags();
+            if (tags != null)
             {
-                foreach (string guid in guids) {
-                    Tag tag = AssetDatabase.LoadAssetAtPath<Tag>(AssetDatabase.GUIDToAssetPath(guid));
+                foreach (Tag tag in tags) {
+                    
                     if (tag == null)
                     {
                         continue;
@@ -187,43 +187,53 @@ namespace Babbel {
 
             } else
             {
-                EditorGUILayout.HelpBox("Feature not yet implemented", MessageType.Error);
+                if (displayMode == DisplayMode.UsedActive)
+                {
+                    EditorGUILayout.HelpBox("The Babbel:Story window doesn't have anything selected", MessageType.Info);
+                }
+                else {
+                    EditorGUILayout.HelpBox("Feature not yet implemented", MessageType.Error);
+                }
             }
             GUILayout.FlexibleSpace();
             GUILayout.EndScrollView();
             EditorGUILayout.EndHorizontal();
         }
 
-        List<string> GetGUIDs()
+        List<Tag> GetTags()
         {
-            //TODO: Don't search database each time in future...
-            List<string> GUIDs = new List<string>();
-            string[] guids = AssetDatabase.FindAssets("t:Babbel.Tag");
-                        
-            
+
+            List<Tag> tags = new List<Tag>();
+                                  
             if (displayMode == DisplayMode.All)
             {
-                GUIDs.AddRange(guids);
+                foreach (string guid in GetGUIDs())
+                {                
+                    tags.Add(AssetDatabase.LoadAssetAtPath<Tag>(AssetDatabase.GUIDToAssetPath(guid)));
+                }
             }
             else if (displayMode == DisplayMode.Used)
             {
-                Hash128 empty = new Hash128(0,0,0,0);               
-                foreach (string guid in guids)
-                {
-                    if (AssetDatabase.GetAssetDependencyHash(guid) != empty)
-                    {
-                        GUIDs.Add(guid);
-                    }
-                }
+                tags.AddRange(StoryBoardWindow.Story.All<Tag>());
+
             } else if (displayMode == DisplayMode.NotUsed)
             {
-                Hash128 empty = new Hash128(0, 0, 0, 0);
-                foreach (string guid in guids)
+                foreach (string guid in GetGUIDs())
                 {
-                    if (AssetDatabase.GetAssetDependencyHash(guid) == empty)
-                    {
-                        GUIDs.Add(guid);
+                    Tag tag = AssetDatabase.LoadAssetAtPath<Tag>(AssetDatabase.GUIDToAssetPath(guid));
+                    if (!StoryBoardWindow.Story.Contains(tag))
+                    {                        
+                        tags.Add(tag);
                     }
+                }
+            }
+            else if (displayMode == DisplayMode.UsedActive)
+            {
+                if (StoryBoardWindow.ActiveBoard == null)
+                {
+                    return null;
+                } else {
+                    tags.AddRange(StoryBoardWindow.ActiveBoard.All<Tag>());
                 }
             }
             else
@@ -231,8 +241,14 @@ namespace Babbel {
                 return null;
             }
 
-            return GUIDs;
+            return tags;
         }
+
+        string[] GetGUIDs()
+        {
+            return  AssetDatabase.FindAssets("t:Babbel.Tag");
+        }
+
 
         void AddTag(Tag tag)
         {
