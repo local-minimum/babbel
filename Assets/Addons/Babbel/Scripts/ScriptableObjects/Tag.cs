@@ -65,6 +65,5 @@ namespace Babbel {
                 throw new System.MissingMemberException("Can't filter on requested criteria: " + criteria);
             }
         }
-	}
-
+    }
 }
