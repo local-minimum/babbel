@@ -83,7 +83,23 @@ namespace Babbel
                 GUILayout.BeginHorizontal();
                 GUILayout.Label(theme.StoryActs, theme.Title);
 
-                //TODO: List Acts
+                foreach (StoryAct act in Story.acts)
+                {
+                    bool isTheActiveAct = act == activeAct;
+                    if (GUILayout.Button(act.name, isTheActiveAct ? theme.DownStateToggle : theme.UpStateToggle))
+                    {
+                        if (isTheActiveAct)
+                        {
+                            activeAct = null;
+                        }
+                        else
+                        {
+                            activeAct = act;
+                        }
+                        activeScene = null;
+
+                    }
+                }
 
                 if (GUILayout.Button(theme.Add, theme.UpStateToggle))
                 {
@@ -97,7 +113,23 @@ namespace Babbel
                 GUILayout.BeginHorizontal();
                 GUILayout.Label(theme.StoryScenes, theme.Title);
 
-                //TODO: List Scenes
+                if (activeAct != null)
+                {
+                    foreach(Scene scene in activeAct.All<Scene>())
+                    {
+                        bool isTheActiveScene = scene == activeScene;
+                        if (GUILayout.Button(scene.name, isTheActiveScene ? theme.DownStateToggle : theme.UpStateToggle))
+                        {
+                            if (isTheActiveScene)
+                            {
+                                activeScene = null;
+                            } else
+                            {
+                                activeScene = scene;
+                            }
+                        }
+                    }
+                }
 
                 if (GUILayout.Button(theme.Add, activeAct == null ? theme.DownStateToggle : theme.UpStateToggle))
                 {

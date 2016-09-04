@@ -22,7 +22,13 @@ namespace Babbel
 
         public override IEnumerable<T> All<T>()
         {
-            return scenes.SelectMany(e => e.All<T>());
+            if (typeof(T) == typeof(Scene))
+            {
+                return scenes.Cast<T>();
+            }
+            else {
+                return scenes.SelectMany(e => e.All<T>());
+            }
         }
     }
 
