@@ -14,6 +14,8 @@ namespace Babbel
         BabbelStory activeStory = null;
         StoryAct activeAct = null;
         Scene activeScene = null;
+        string editActiveActName = null;
+        string editAcitveSceneName = null;
         
         static StoryBoardWindow window;
 
@@ -81,20 +83,34 @@ namespace Babbel
                 //ACTS
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(theme.StoryActs, theme.Title);
+                if (GUILayout.Button(theme.StoryActs, theme.Title))
+                {
+                    activeAct = null;
+                    activeScene = null;
+                    editActiveActName = null;
+                }
 
                 foreach (StoryAct act in Story.acts)
                 {
                     bool isTheActiveAct = act == activeAct;
-                    if (GUILayout.Button(act.name, isTheActiveAct ? theme.DownStateToggle : theme.UpStateToggle))
+                    if (isTheActiveAct && editActiveActName != null)
+                    {                        
+                        editActiveActName = GUILayout.TextField(editActiveActName, theme.Input);
+                        if (GUILayout.Button(theme.Save, theme.UpStateToggle))
+                        {
+                            AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(activeAct), editActiveActName);
+                            editActiveActName = null;
+                        }
+                    } else if (GUILayout.Button(act.name, isTheActiveAct ? theme.DownStateToggle : theme.UpStateToggle))
                     {
                         if (isTheActiveAct)
                         {
-                            activeAct = null;
+                            editActiveActName = act.name;
                         }
                         else
                         {
                             activeAct = act;
+                            editActiveActName = null;
                         }
                         activeScene = null;
 
@@ -111,21 +127,36 @@ namespace Babbel
                 //SCENES
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(theme.StoryScenes, theme.Title);
+                if (GUILayout.Button(theme.StoryScenes, theme.Title))
+                {
+                    activeScene = null;
+                    editAcitveSceneName = null;
+                }
 
                 if (activeAct != null)
                 {
                     foreach(Scene scene in activeAct.All<Scene>())
                     {
                         bool isTheActiveScene = scene == activeScene;
-                        if (GUILayout.Button(scene.name, isTheActiveScene ? theme.DownStateToggle : theme.UpStateToggle))
+
+                        if (isTheActiveScene && editAcitveSceneName != null)
+                        {
+                            editAcitveSceneName = GUILayout.TextField(editAcitveSceneName, theme.Input);
+                            if (GUILayout.Button(theme.Save, theme.UpStateToggle))
+                            {
+                                AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(activeScene), editAcitveSceneName);
+                                editAcitveSceneName = null;
+                            }
+                        }
+                        else if (GUILayout.Button(scene.name, isTheActiveScene ? theme.DownStateToggle : theme.UpStateToggle))
                         {
                             if (isTheActiveScene)
                             {
-                                activeScene = null;
+                                editAcitveSceneName = scene.name;
                             } else
                             {
                                 activeScene = scene;
+                                editAcitveSceneName = null;
                             }
                         }
                     }
