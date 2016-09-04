@@ -176,7 +176,7 @@ namespace Babbel {
                     }
 
                     if (!string.IsNullOrEmpty(filterQuery)) {
-                        if (tag.name.Contains(filterQuery) || tag.description.Contains(filterQuery))
+                        if (tag.Matches(filterQuery))
                         {
                             AddTag(tag);
                         }
