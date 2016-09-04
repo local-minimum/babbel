@@ -119,7 +119,10 @@ namespace Babbel
 
                 if (GUILayout.Button(theme.Add, theme.UpStateToggle))
                 {
-
+                    string storyPath = AssetDatabase.GetAssetPath(Story);
+                    activeAct = AssetTools.CreateAsset<StoryAct>(storyPath + "/Acts");
+                    Story.acts.Add(activeAct);
+                    editActiveActName = activeAct.name;
                 }
                 GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
@@ -164,9 +167,13 @@ namespace Babbel
 
                 if (GUILayout.Button(theme.Add, activeAct == null ? theme.DownStateToggle : theme.UpStateToggle))
                 {
+                    //Only allow adding scenes when we are in an act!
                     if (activeAct == null)
                     {
-
+                        string actPath = AssetDatabase.GetAssetPath(activeAct);
+                        activeScene = AssetTools.CreateAsset<Scene>(actPath + "/Scenes");
+                        activeAct.scenes.Add(activeScene);
+                        editAcitveSceneName = activeScene.name;
                     }
                 }
                 GUILayout.FlexibleSpace();

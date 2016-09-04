@@ -8,7 +8,7 @@ namespace Babbel
     public class StoryAct : AbstractBoard
     {
 
-        List<Scene> scenes = new List<Scene>();
+        public List<Scene> scenes = new List<Scene>();
 
         public override bool Contains(SpeechAct speechAct)
         {
