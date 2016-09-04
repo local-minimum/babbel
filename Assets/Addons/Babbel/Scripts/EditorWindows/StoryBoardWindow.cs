@@ -68,7 +68,7 @@ namespace Babbel
         void AddMenu()
         {
 
-            if (GUI.Button(menuPosition, theme.Menu, expandedMenu ? theme.TitleActive : theme.Title)) {
+            if (GUI.Button(menuPosition, theme.Menu, expandedMenu ? theme.TitleAcitveIconAligning : theme.TitleIconAligning)) {
                 expandedMenu = !expandedMenu;
             }
 
@@ -92,16 +92,16 @@ namespace Babbel
 
                 foreach (StoryAct act in Story.acts)
                 {
-                    bool isTheActiveAct = act == activeAct;
+                    bool isTheActiveAct = act == activeAct && activeAct != null;
                     if (isTheActiveAct && editActiveActName != null)
                     {                        
-                        editActiveActName = GUILayout.TextField(editActiveActName, theme.Input);
-                        if (GUILayout.Button(theme.Save, theme.UpStateToggle))
+                        editActiveActName = GUILayout.TextField(editActiveActName, theme.IconAligningInput);
+                        if (GUILayout.Button(theme.SaveIcon, theme.Title))
                         {
                             AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(activeAct), editActiveActName);
                             editActiveActName = null;
                         }
-                    } else if (GUILayout.Button(act.name, isTheActiveAct ? theme.DownStateToggle : theme.UpStateToggle))
+                    } else if (GUILayout.Button(act.name, isTheActiveAct ? theme.TitleAcitveIconAligning : theme.TitleIconAligning))
                     {
                         if (isTheActiveAct)
                         {
@@ -117,13 +117,16 @@ namespace Babbel
                     }
                 }
 
-                if (GUILayout.Button(theme.Add, theme.UpStateToggle))
+                if (GUILayout.Button(theme.AddIcon, theme.Title))
                 {
-                    string newActPath = AssetDatabase.GetAssetPath(Story) + "_Acts/";
-                    AssetTools.EnsureFolder(newActPath);
-                    activeAct = AssetTools.CreateAsset<StoryAct>(newActPath);
-                    Story.acts.Add(activeAct);
-                    editActiveActName = activeAct.name;
+                    string newActPath = AssetDatabase.GetAssetPath(Story);
+                    if (!string.IsNullOrEmpty(newActPath)) {
+                        newActPath += "_Acts/";
+                        AssetTools.EnsureFolder(newActPath);
+                        activeAct = AssetTools.CreateAsset<StoryAct>(newActPath);
+                        Story.acts.Add(activeAct);
+                        editActiveActName = activeAct.name;
+                    }
                 }
                 GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
@@ -141,18 +144,18 @@ namespace Babbel
                 {
                     foreach(Scene scene in activeAct.All<Scene>())
                     {
-                        bool isTheActiveScene = scene == activeScene;
+                        bool isTheActiveScene = scene == activeScene && activeScene != null;
 
                         if (isTheActiveScene && editAcitveSceneName != null)
                         {
                             editAcitveSceneName = GUILayout.TextField(editAcitveSceneName, theme.Input);
-                            if (GUILayout.Button(theme.Save, theme.UpStateToggle))
+                            if (GUILayout.Button(theme.SaveIcon, theme.Title))
                             {
                                 AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(activeScene), editAcitveSceneName);
                                 editAcitveSceneName = null;
                             }
                         }
-                        else if (GUILayout.Button(scene.name, isTheActiveScene ? theme.DownStateToggle : theme.UpStateToggle))
+                        else if (GUILayout.Button(scene.name, isTheActiveScene ? theme.TitleAcitveIconAligning : theme.TitleIconAligning))
                         {
                             if (isTheActiveScene)
                             {
@@ -166,16 +169,20 @@ namespace Babbel
                     }
                 }
 
-                if (GUILayout.Button(theme.Add, activeAct == null ? theme.DownStateToggle : theme.UpStateToggle))
+                if (GUILayout.Button(theme.AddIcon, activeAct == null ? theme.DownStateToggle : theme.Title))
                 {
                     //Only allow adding scenes when we are in an act!
                     if (activeAct != null)
                     {
-                        string newScenePath = AssetDatabase.GetAssetPath(Story) + "_Scenes/";
-                        AssetTools.EnsureFolder(newScenePath);
-                        activeScene = AssetTools.CreateAsset<Scene>(newScenePath);
-                        activeAct.scenes.Add(activeScene);
-                        editAcitveSceneName = activeScene.name;
+                        string newScenePath = AssetDatabase.GetAssetPath(Story);
+                        if (!string.IsNullOrEmpty(newScenePath))
+                        {
+                            newScenePath += "_Scenes/";
+                            AssetTools.EnsureFolder(newScenePath);
+                            activeScene = AssetTools.CreateAsset<Scene>(newScenePath);
+                            activeAct.scenes.Add(activeScene);
+                            editAcitveSceneName = activeScene.name;
+                        }
                     }
                 }
                 GUILayout.FlexibleSpace();
@@ -185,18 +192,15 @@ namespace Babbel
                 GUILayout.BeginHorizontal();
                 if (activeAct == null)
                 {
-                    GUILayout.Label(theme.NoAct, theme.Title);
+                    GUILayout.Label(theme.NoAct, theme.TitleAcitveIconAligning);
                 } else
                 {
-                    GUILayout.Label(activeAct.name, theme.Title);
+                    GUILayout.Label(activeAct.name, activeScene == null ? theme.TitleAcitveIconAligning : theme.TitleIconAligning);
 
-                    if (activeScene == null)
+                    if (activeScene != null)
                     {
-                        GUILayout.Label(theme.NoScene, theme.Text);
-                    } else
-                    {
-                        GUILayout.Label(activeScene.name, theme.Text);
-                    }
+                        GUILayout.Label(activeScene.name, theme.TitleAcitveIconAligning);
+                    } 
                 }
 
                 GUILayout.FlexibleSpace();

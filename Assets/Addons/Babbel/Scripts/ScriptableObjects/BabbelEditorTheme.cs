@@ -19,8 +19,12 @@ namespace Babbel
         public GUIStyle DownStateToggle;
         public GUIStyle Input;
         public GUIStyle IconAligningInput;
+           
         public GUIStyle Title;
+        public GUIStyle TitleIconAligning;
         public GUIStyle TitleActive;
+        public GUIStyle TitleAcitveIconAligning;
+
         public GUIStyle Text;
         public GUIStyle Scrolls;
 
@@ -34,10 +38,12 @@ namespace Babbel
         [Space()]
 
         public GUIContent Add;
+        public GUIContent AddIcon;        
         public GUIContent Save;
+        public GUIContent SaveIcon;
         public GUIContent SaveClose;
         public GUIContent Close;
-        public GUIContent Delete;
+        public GUIContent Delete;        
         public GUIContent Filter;
         public GUIContent Menu;
 
